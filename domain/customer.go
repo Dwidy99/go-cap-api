@@ -14,20 +14,22 @@ type Customer struct {
 	Status      string `json:"status" xml:"status"`
 }
 
+// Kontrak untuk di implementasikan di package service
 type CustomerRepository interface {
-	FindAll() ([]Customer, error)
+	FindAll(string) ([]Customer, *errs.AppErr)
 	FindByID(string) (*Customer, *errs.AppErr)
 }
 
-func (c Customer) convertStatusName() string {
-	statusName := "active"
+func (c Customer) convertStatusCustomer() string {
+	statusCustomer := "active"
 	if c.Status == "0" {
-		statusName = "inactive"
+		statusCustomer = "inactive"
 	}
 
-	return statusName
+	return statusCustomer
 }
 
+// dto.CustomerResponse ada di package dto
 func (c Customer) ToDTO() dto.CustomerResponse {
 
 	return dto.CustomerResponse{
@@ -36,6 +38,6 @@ func (c Customer) ToDTO() dto.CustomerResponse {
 		DateOfBirth: c.DateOfBirth,
 		City: c.City,
 		ZipCode: c.ZipCode,
-		Status: c.Status,
+		Status: c.convertStatusCustomer(),
 	}
 }
