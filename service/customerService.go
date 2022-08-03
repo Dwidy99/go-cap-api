@@ -7,21 +7,40 @@ import (
 )
 
 type CustomerService interface {
-	GetAllCustomers() ([]domain.Customer, error)
+	GetAllCustomers(string) ([]dto.CustomerResponse, *errs.AppErr)
 	GetCustomerByID(string) (*dto.CustomerResponse, *errs.AppErr)
 }
 
 type DefaultCustomerService struct {
-	repository domain.CustomerRepository
+	repo domain.CustomerRepository
 }
 
-func (s DefaultCustomerService) GetAllCustomers() ([]domain.Customer, error) {
-	// * add process here	
-	return s.repository.FindAll()
+func (s DefaultCustomerService) GetAllCustomers(status string) ([]dto.CustomerResponse, *errs.AppErr) {
+	if status == "active" {
+		status = "1"
+	} else if status == "inactive" {
+		status = "0"
+	} else if status == "" {
+		status = ""
+	} else {
+		return nil, errs.NewBadRequestError("invalid request")
+	}
+
+	customers, err := s.repo.FindAll(status)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []dto.CustomerResponse
+	for _, customer := range customers {
+		response = append(response, customer.ToDTO())
+	}
+
+	return response, nil
 }
 
 func (s DefaultCustomerService) GetCustomerByID(CustomerID string) (*dto.CustomerResponse, *errs.AppErr) {
-	cust, err := s.repository.FindByID(CustomerID)
+	cust, err := s.repo.FindByID(CustomerID)
 	if err != nil {
 		return nil, err
 	}
@@ -32,5 +51,5 @@ func (s DefaultCustomerService) GetCustomerByID(CustomerID string) (*dto.Custome
 }
 
 func NewCustomerService(repository domain.CustomerRepository) DefaultCustomerService {
-	return DefaultCustomerService{repository: repository}
+	return DefaultCustomerService{repository}
 }

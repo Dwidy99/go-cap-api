@@ -88,9 +88,10 @@ func Start() {
 	customerR.HandleFunc("/{customer_id:[0-9]+}/accounts/{account_id:[0-9]+}", ah.MakeTransaction).Methods("POST")
 	customerR.Use(authMiddleware)
 
-	adminR := mux.PathPrefix("/admin").Subrouter()
+	// New Account
+	adminR := mux.PathPrefix("/customers").Subrouter()
 	adminR.HandleFunc("", ch.getAllCustomers).Methods("GET")
-	adminR.HandleFunc("/{customer_id:[0-9]+}/accounts", ah.NewAccount).Methods(http.MethodGet)
+	adminR.HandleFunc("/{customer_id:[0-9]+}/accounts", ah.NewAccount).Methods(http.MethodPost)
 	adminR.Use(authMiddleware)
 	adminR.Use(isAdminMiddleware)
 	

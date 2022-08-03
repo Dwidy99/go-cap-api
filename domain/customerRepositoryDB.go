@@ -15,13 +15,13 @@ type CustomerRepositoryDB struct {
 }
 
 func NewCustomerRepositoryDB(client *sqlx.DB) CustomerRepositoryDB {
-	connStr := "user=postgres password=d dbname=banking sslmode=disable"
-	db, err := sqlx.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal("Your Database->  ", err)
-	}
+	// connStr := "user=postgres password=d dbname=banking sslmode=disable"
+	// db, err := sqlx.Open("postgres", connStr)
+	// if err != nil {
+	// 	log.Fatal("Your Database->  ", err)
+	// }
 
-	return CustomerRepositoryDB{db}
+	return CustomerRepositoryDB{client}
 }
 
 func (d CustomerRepositoryDB) FindByID(customerID string) (*Customer, *errs.AppErr) {
@@ -45,13 +45,13 @@ func (d CustomerRepositoryDB) FindByID(customerID string) (*Customer, *errs.AppE
 	return &c, nil
 }
 
-func (d CustomerRepositoryDB) FindAll() ([]Customer, error) {
+func (d CustomerRepositoryDB) FindAll(status string) ([]Customer, *errs.AppErr) {
 	query := "select * from customers"
 
 	rows, err := d.db.Query(query)
 	if err != nil {
 		log.Println("error query data to customer table ", err.Error())
-		return nil, err
+		return nil, errs.NewUnexpectedError("Data Customer Error")
 	}
 
 	var customers []Customer

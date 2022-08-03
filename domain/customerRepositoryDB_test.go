@@ -34,7 +34,7 @@ func TestCustomerRepositoryDB_FindAll(t *testing.T) {
 		wantErr *errs.AppErr
 	}{
 		{
-			"Success Get All Data",
+			"Success Get All Data Customers",
 			args{""},
 			[]Customer{
 				{"1", "User1", "Tangerang", "15540", "2012-01-01", "1"},
@@ -50,10 +50,10 @@ func TestCustomerRepositoryDB_FindAll(t *testing.T) {
 			db, mock := NewMock()
 			repo := NewCustomerRepositoryDB(db)
 
-			rows := mock.NewRows([]string{"customer_id", "name", "city", "zip_code", "date_of_birth", "status"}).AddRow("1", "User1", "Tangerang", "15540", "2012-01-01", "1").AddRow("2", "User2", "Jakarta", "15641", "2022-02-12", "1").AddRow("3", "User3", "Bandung", "15542", "2021-06-12", "1")
+			rows := mock.NewRows([]string{"customer_id", "name", "city", "zipcode", "date_of_birth", "status"}).AddRow("1", "User1", "Tangerang", "15540", "2012-01-01", "1").AddRow("2", "User2", "Jakarta", "15641", "2022-02-12", "1")
 
-			mock.ExpectQuery("select * form customers").WillReturnRows(rows)
-			got, got1 := repo.FindAll(tt, args, status)
+			mock.ExpectQuery(`select \* form customers`).WillReturnRows(rows)
+			got, got1 := repo.FindAll(tt.args.status)
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CustomerRepositoryDB.FindAll() got = %v, want %v", got, tt.want)
