@@ -17,7 +17,7 @@ func init() {
 	config.EncoderConfig = encoderConfig
 
 	var err error
-	log, err = config.Build()
+	log, err = config.Build(zap.AddCallerSkip(1))
 	if err != nil {
 		panic(err)
 	}

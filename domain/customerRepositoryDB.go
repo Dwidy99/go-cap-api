@@ -11,7 +11,7 @@ import (
 )
 
 type CustomerRepositoryDB struct {
-	client *sqlx.DB
+	db *sqlx.DB
 }
 
 func NewCustomerRepositoryDB(client *sqlx.DB) CustomerRepositoryDB {
@@ -30,7 +30,7 @@ func (d CustomerRepositoryDB) FindByID(customerID string) (*Customer, *errs.AppE
 	// row := d.client.QueryRow(query, customerID)
 
 	var c Customer
-	err := d.client.Get(&c, query, customerID)
+	err := d.db.Get(&c, query, customerID)
 	// err := row.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -48,7 +48,7 @@ func (d CustomerRepositoryDB) FindByID(customerID string) (*Customer, *errs.AppE
 func (d CustomerRepositoryDB) FindAll() ([]Customer, error) {
 	query := "select * from customers"
 
-	rows, err := d.client.Query(query)
+	rows, err := d.db.Query(query)
 	if err != nil {
 		log.Println("error query data to customer table ", err.Error())
 		return nil, err
